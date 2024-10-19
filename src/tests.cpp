@@ -1,39 +1,90 @@
-#include "tests.h"
-
+#include"tests.h"
+#include<vector>
+#include<string>
+#include<iostream>
+using namespace std;
 // 练习1，实现库函数strlen
-int my_strlen(char *str) {
+int my_strlen(char* str) {
     /**
      * 统计字符串的长度，太简单了。
      */
 
-    // IMPLEMENT YOUR CODE HERE
-    return 0;
-}
+     // IMPLEMENT YOUR CODE HERE
+    int len = 0;
+    while (*str != '\0')
+    {
+        len++;
+        str++;
+    }
+    return len;
+};
 
 
 // 练习2，实现库函数strcat
-void my_strcat(char *str_1, char *str_2) {
+void my_strcat(char* str_1, char* str_2) {
     /**
      * 将字符串str_2拼接到str_1之后，我们保证str_1指向的内存空间足够用于添加str_2。
      * 注意结束符'\0'的处理。
      */
 
-    // IMPLEMENT YOUR CODE HERE
-}
+     // IMPLEMENT YOUR CODE HERE
+    while (*str_1 != '\0')
+    {
+        str_1++;
+    }
+    while (*str_2 != '\0')
+    {
+        *str_1 = *str_2;
+        str_1++;
+        str_2++;
+    }
+    str_1++;
+    *str_1 = '\0';
+};
 
 
 // 练习3，实现库函数strstr
-char* my_strstr(char *s, char *p) {
+char* my_strstr(char* s, char* p) {
     /**
      * 在字符串s中搜索字符串p，如果存在就返回第一次找到的地址，不存在就返回空指针(0)。
      * 例如：
      * s = "123456", p = "34"，应该返回指向字符'3'的指针。
      */
 
-    // IMPLEMENT YOUR CODE HERE
+     // IMPLEMENT YOUR CODE HERE
+    if (s == NULL || p == NULL)
+    {
+        return 0;
+    }//检查空指针
+    size_t p_len = my_strlen(p);
+    if (p_len == 0)
+    {
+        return s;
+    }//检查p的长度是否为0
+    if (p_len > my_strlen(s))
+    {
+        return 0;
+    }
+    ; char first = p[0];
+    for (char* s_tamp = s; s_tamp <= s + my_strlen(s) - p_len; s_tamp++)
+    {
+        if (*s_tamp == first)
+        {
+            char* s_tamp2 = s_tamp;
+            char* p_tamp = p;
+            while (*p_tamp && *s_tamp2 == *p_tamp)
+            {
+                p_tamp++;
+                s_tamp2++;
+            }
+            if (!*p_tamp)
+            {
+                return s_tamp;
+            }
+        }
+    }
     return 0;
-}
-
+};
 
 /**
  * ================================= 背景知识 ==================================
@@ -75,7 +126,7 @@ char* my_strstr(char *s, char *p) {
 
 
 // 练习4，将彩色图片(rgb)转化为灰度图片
-void rgb2gray(float *in, float *out, int h, int w) {
+void rgb2gray(float* in, float* out, int h, int w) {
     /**
      * 编写这个函数，将一张彩色图片转化为灰度图片。以下是各个参数的含义：
      * (1) float *in:  指向彩色图片对应的内存区域（或者说数组）首地址的指针。
@@ -95,12 +146,21 @@ void rgb2gray(float *in, float *out, int h, int w) {
      * (2) 内存的访问。
      */
 
-    // IMPLEMENT YOUR CODE HERE
-    // ...
-}
+     // IMPLEMENT YOUR CODE HERE
+     // ...
+     for(int i=0;i<h;i++)
+     {
+        for(int j=0;j<w;j++)
+        {
+            int index=(i*w+j)*3;
+            float gray=0.1140*in[index+2]+0.5870*in[index+1]+0.2989*in[index];
+            out[i*w+j]=gray;
+        }
+     }
+};
 
 // 练习5，实现图像处理算法 resize：缩小或放大图像
-void resize(float *in, float *out, int h, int w, int c, float scale) {
+void resize(float* in, float* out, int h, int w, int c, float scale) {
     /**
      * 图像处理知识：
      *  1.单线性插值法
@@ -196,15 +256,61 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
      *        所以需要对其进行边界检查
      */
 
-    int new_h = h * scale, new_w = w * scale;
+    //int new_h = h * scale, new_w = w * scale;
     // IMPLEMENT YOUR CODE HERE
+    int new_h = static_cast<int>(h * scale);
+    int new_w = static_cast<int>(w * scale);
 
-}
+    /* 如果输入和输出指针为空，或输入图像的宽高或通道数为零，则抛出异常
+    if (in == nullptr || out == nullptr || h <= 0 || w <= 0 || c <= 0 || new_h <= 0 || new_w <= 0) {
+        throw std::invalid_argument("Invalid input arguments");
+    }*/
+
+    // 计算原图像和目标图像的步长  
+    int src_stride = w * c;
+    int dst_stride = new_w * c;
+
+    // 遍历目标图像的每个像素点  
+    for (int y = 0; y < new_h; ++y) {
+        for (int x = 0; x < new_w; ++x) {
+            // 计算对应原图像中的坐标  
+            float x0 = x / scale;
+            float y0 = y / scale;
+
+            // 计算对应的四个邻居点  
+            int x1 = static_cast<int>(x0);
+            int y1 = static_cast<int>(y0);
+            int x2 = std::min(x1 + 1, w - 1);
+            int y2 = std::min(y1 + 1, h - 1);
+
+            // 获取四个邻居点的像素值  
+            float P1 = in[(y1 * w + x1) * c];
+            float P2 = in[(y1 * w + x2) * c];
+            float P3 = in[(y2 * w + x1) * c];
+            float P4 = in[(y2 * w + x2) * c];
+
+            // 插值计算  
+            float dx = x0 - x1;
+            float dy = y0 - y1;
+
+            float Q1 = P1 * (1 - dx) + P2 * dx;
+            float Q2 = P3 * (1 - dx) + P4 * dx;
+            float Q = Q1 * (1 - dy) + Q2 * dy;
+
+            // 设置目标图像的像素值  
+            for (int c_idx = 0; c_idx < c; ++c_idx) {
+                out[((y * new_w + x) * c + c_idx)] = Q;
+            }
+        }
+    }
+};
+
+
 
 
 // 练习6，实现图像处理算法：直方图均衡化
-void hist_eq(float *in, int h, int w) {
-    /**
+void hist_eq(float* in, int h, int w) {
+    /*
      * 将输入图片进行直方图均衡化处理。参数含义：
      * (1) float *in: 输入的灰度图片。
      * (2) int h:     height，即图片的高度。
@@ -220,5 +326,32 @@ void hist_eq(float *in, int h, int w) {
      * (3) 使用数组来实现灰度级 => 灰度级的映射
      */
 
-    // IMPLEMENT YOUR CODE HERE
-}
+     // IMPLEMENT YOUR CODE HERE
+    float src[256] = { 0 };//灰度直方图
+    long long N = h * w;
+    for (long long i = 0; i < N; i++)
+    {
+        int temp = (int)in[i];
+        src[temp]++;
+    }
+    //原始图像灰度分布频率
+    float pr[256] = { 0 };
+    for (int i = 0; i < 256; i++)
+    {
+        pr[i] = src[i] / N;
+    }
+    //原始图像灰度积累分布频率
+    float sk[256] = { 0 };
+    sk[0] = pr[0];
+    for (int i = 0; i < 256; i++)
+    {
+        sk[i] = sk[i - 1] + pr[i];
+    }
+    for (long long i = 0; i < N; i++)
+    {
+        int temp = (int)(in[i]);
+        float cdf = sk[temp] * 255;
+        in[i] = (int)(cdf + 0.5);
+    }
+};
+
