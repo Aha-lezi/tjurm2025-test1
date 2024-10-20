@@ -152,9 +152,9 @@ void rgb2gray(float* in, float* out, int h, int w) {
      {
         for(int j=0;j<w;j++)
         {
-             int index=(i*w+j)*3;
-             float gray=0.1140*in[index+2]+0.5870*in[index+1]+0.2989*in[index];
-             out[i*w+j]=gray;
+            int index=(i*w+j)*3;
+            float gray=0.1140*in[index+2]+0.5870*in[index+1]+0.2989*in[index];
+            out[i*w+j]=gray;
         }
      }
 };
