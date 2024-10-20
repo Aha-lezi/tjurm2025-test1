@@ -55,12 +55,12 @@ char* my_strstr(char* s, char* p) {
     if (s == NULL || p == NULL)
     {
         return 0;
-    }//检查空指针
+    }
     size_t p_len = my_strlen(p);
     if (p_len == 0)
     {
         return s;
-    }//检查p的长度是否为0
+    }
     if (p_len > my_strlen(s))
     {
         return 0;
@@ -280,8 +280,8 @@ void resize(float* in, float* out, int h, int w, int c, float scale) {
             // 计算对应的四个邻居点  
             int x1 = static_cast<int>(x0);
             int y1 = static_cast<int>(y0);
-            int x2 = std::min(x1 + 1, w - 1);
-            int y2 = std::min(y1 + 1, h - 1);
+            int x2 = min(x1 + 1, w - 1);
+            int y2 = min(y1 + 1, h - 1);
 
             // 获取四个邻居点的像素值  
             float P1 = in[(y1 * w + x1) * c];
